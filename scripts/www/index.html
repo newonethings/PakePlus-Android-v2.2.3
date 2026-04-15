@@ -1,11 +1,360 @@
 <!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>PakePlus</title>
-    </head>
-    <body>
-        PakePlus
-    </body>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>专用计算器</title>
+<style>
+*{box-sizing: border-box;}
+body{font-family:Arial;padding:10px;background:#f2f2f2;display:flex;justify-content:center;margin:0;}
+.main{width:100%;max-width:380px;}
+.item{background:white;padding:12px;margin:8px 0;border-radius:8px}
+h3{font-size:16px;margin:0 0 6px 0;color:#333}
+input{width:100%;padding:10px;margin:4px 0;border:1px solid #ccc;border-radius:6px;font-size:15px;}
+
+/* 按钮行：计算 + 清空 并排 */
+.btn-row{display:flex;gap:6px;margin-top:6px;}
+button{flex:1;padding:10px;border:none;border-radius:6px;font-size:15px;}
+.calc{background:#007AFF;color:white;}
+.clear{background:#FF3B30;color:white;}
+
+.res{margin-top:8px;font-weight:bold;color:#000;font-size:15px;line-height:1.4}
+
+/* 底部内容样式 */
+.footer-content{text-align:center;font-size:15px;color:#333;padding:8px 0;}
+
+/* 自定义居中弹窗样式 */
+.modal-overlay{
+  position:fixed;top:0;left:0;width:100%;height:100%;
+  background:rgba(0,0,0,0.5);display:none;justify-content:center;align-items:center;
+  z-index:9999;
+}
+.modal-box{
+  background:white;padding:25px;border-radius:12px;min-width:260px;
+  text-align:center;box-shadow:0 4px 15px rgba(0,0,0,0.2);
+}
+.modal-text{font-size:16px;margin-bottom:20px;color:#333}
+.modal-btn{
+  background:#007AFF;color:white;border:none;padding:10px 30px;
+  border-radius:6px;font-size:15px;cursor:pointer;
+}
+</style>
+</head>
+<body>
+<div class="main">
+
+<div class="item">
+<h3>拔丝产量</h3>
+<input id="bs_d" placeholder="直径" oninput="this.value='直径 '+(this.value.replace(/直径/g,''))">
+<input id="bs_v" placeholder="车速" oninput="this.value='车速 '+(this.value.replace(/车速/g,''))">
+<div class="btn-row">
+  <button class="calc" onclick="bs()">计算</button>
+  <button class="clear" onclick="clearBs()">清空</button>
+</div>
+<div class="res" id="bs_r"></div>
+</div>
+
+<div class="item">
+<h3>镀锌产量</h3>
+<input id="dx_d" placeholder="直径" oninput="this.value='直径 '+(this.value.replace(/直径/g,''))">
+<input id="dx_v" placeholder="车速" oninput="this.value='车速 '+(this.value.replace(/车速/g,''))">
+<div class="btn-row">
+  <button class="calc" onclick="dx()">计算</button>
+  <button class="clear" onclick="clearDx()">清空</button>
+</div>
+<div class="res" id="dx_r"></div>
+</div>
+
+<div class="item">
+<h3>拔后上锌量</h3>
+<input id="bz_z" placeholder="拔前上锌量" oninput="this.value='拔前上锌量 '+(this.value.replace(/拔前上锌量/g,''))">
+<input id="bz_d2" placeholder="拔后直径" oninput="this.value='拔后直径 '+(this.value.replace(/拔后直径/g,''))">
+<input id="bz_d1" placeholder="拔前直径" oninput="this.value='拔前直径 '+(this.value.replace(/拔前直径/g,''))">
+<div class="btn-row">
+  <button class="calc" onclick="bz()">计算</button>
+  <button class="clear" onclick="clearBz()">清空</button>
+</div>
+<div class="res" id="bz_r"></div>
+</div>
+
+<div class="item">
+<h3>实测上锌量</h3>
+<input id="sc_b" placeholder="白丝重量" oninput="this.value='白丝重量 '+(this.value.replace(/白丝重量/g,''))">
+<input id="sc_h" placeholder="黑丝重量" oninput="this.value='黑丝重量 '+(this.value.replace(/黑丝重量/g,''))">
+<input id="sc_d" placeholder="黑丝直径" oninput="this.value='黑丝直径 '+(this.value.replace(/黑丝直径/g,''))">
+<div class="btn-row">
+  <button class="calc" onclick="sc()">计算</button>
+  <button class="clear" onclick="clearSc()">清空</button>
+</div>
+<div class="res" id="sc_r"></div>
+</div>
+
+<div class="item">
+<h3>拔后强度</h3>
+<input id="qd_q" placeholder="拔前强度" oninput="this.value='拔前强度 '+(this.value.replace(/拔前强度/g,''))">
+<input id="qd_d1" placeholder="拔前直径" oninput="this.value='拔前直径 '+(this.value.replace(/拔前直径/g,''))">
+<input id="qd_d2" placeholder="拔后直径" oninput="this.value='拔后直径 '+(this.value.replace(/拔后直径/g,''))">
+<div class="btn-row">
+  <button class="calc" onclick="qd()">计算</button>
+  <button class="clear" onclick="clearQd()">清空</button>
+</div>
+<div class="res" id="qd_r"></div>
+</div>
+
+<div class="item">
+<h3>强度计算</h3>
+<input id="qd2_f" placeholder="拉断力" oninput="this.value='拉断力 '+(this.value.replace(/拉断力/g,''))">
+<input id="qd2_d" placeholder="直径" oninput="this.value='直径 '+(this.value.replace(/直径/g,''))">
+<div class="btn-row">
+  <button class="calc" onclick="qd2()">计算</button>
+  <button class="clear" onclick="clearQd2()">清空</button>
+</div>
+<div class="res" id="qd2_r"></div>
+</div>
+
+<div class="item">
+<h3>重量计算</h3>
+<input id="wz_d" placeholder="直径" oninput="this.value='直径 '+(this.value.replace(/直径/g,''))">
+<input id="wz_m" placeholder="米数" oninput="this.value='米数 '+(this.value.replace(/米数/g,''))">
+<input id="wz_x" value="6.11" placeholder="系数6.11" oninput="this.value='系数 '+(this.value.replace(/系数/g,''))">
+<div class="btn-row">
+  <button class="calc" onclick="wz()">计算</button>
+  <button class="clear" onclick="clearWz()">清空</button>
+</div>
+<div class="res" id="wz_r"></div>
+</div>
+
+<div class="item">
+<h3>米数计算</h3>
+<input id="ms_w" placeholder="重量" oninput="this.value='重量 '+(this.value.replace(/重量/g,''))">
+<input id="ms_d" placeholder="直径" oninput="this.value='直径 '+(this.value.replace(/直径/g,''))">
+<input id="ms_x" value="6.11" placeholder="系数6.11" oninput="this.value='系数 '+(this.value.replace(/系数/g,''))">
+<div class="btn-row">
+  <button class="calc" onclick="ms()">计算</button>
+  <button class="clear" onclick="clearMs()">清空</button>
+</div>
+<div class="res" id="ms_r"></div>
+</div>
+
+<div class="item">
+<h3>木轴长度容量</h3>
+<input id="mz_n" placeholder="内宽" oninput="this.value='内宽 '+(this.value.replace(/内宽/g,''))">
+<input id="mz_w" placeholder="外圆直径" oninput="this.value='外圆直径 '+(this.value.replace(/外圆直径/g,''))">
+<input id="mz_t" placeholder="轴筒直径" oninput="this.value='轴筒直径 '+(this.value.replace(/轴筒直径/g,''))">
+<input id="mz_d" placeholder="绞线直径" oninput="this.value='绞线直径 '+(this.value.replace(/绞线直径/g,''))">
+<div class="btn-row">
+  <button class="calc" onclick="mz()">计算</button>
+  <button class="clear" onclick="clearMz()">清空</button>
+</div>
+<div class="res" id="mz_r"></div>
+</div>
+
+<div class="item">
+<h3>木轴重量容量</h3>
+<input id="mzw_d" placeholder="绞线直径" oninput="this.value='绞线直径 '+(this.value.replace(/绞线直径/g,''))">
+<input id="mzw_m" placeholder="长度" oninput="this.value='长度 '+(this.value.replace(/长度/g,''))">
+<div class="btn-row">
+  <button class="calc" onclick="mzw()">计算</button>
+  <button class="clear" onclick="clearMzw()">清空</button>
+</div>
+<div class="res" id="mzw_r"></div>
+</div>
+
+<div class="item">
+<h3>圆钢重量</h3>
+<input id="yg_d" placeholder="直径" oninput="this.value='直径 '+(this.value.replace(/直径/g,''))">
+<input id="yg_l" placeholder="长度" oninput="this.value='长度 '+(this.value.replace(/长度/g,''))">
+<div class="btn-row">
+  <button class="calc" onclick="yg()">计算</button>
+  <button class="clear" onclick="clearYg()">清空</button>
+</div>
+<div class="res" id="yg_r"></div>
+</div>
+
+<div class="item">
+<h3>铁板重量</h3>
+<input id="tb_c" placeholder="长" oninput="this.value='长 '+(this.value.replace(/长/g,''))">
+<input id="tb_k" placeholder="宽" oninput="this.value='宽 '+(this.value.replace(/宽/g,''))">
+<input id="tb_g" placeholder="高" oninput="this.value='高 '+(this.value.replace(/高/g,''))">
+<div class="btn-row">
+  <button class="calc" onclick="tb()">计算</button>
+  <button class="clear" onclick="clearTb()">清空</button>
+</div>
+<div class="res" id="tb_r"></div>
+</div>
+
+<!-- 底部天津燎原 -->
+<div class="item">
+  <div class="footer-content">天津燎原</div>
+</div>
+
+</div>
+
+<!-- 自定义居中弹窗 -->
+<div class="modal-overlay" id="modal">
+  <div class="modal-box">
+    <div class="modal-text" id="modalText">请输入数值</div>
+    <button class="modal-btn" onclick="hideModal()">确定</button>
+  </div>
+</div>
+
+<script>
+function $(id){return document.getElementById(id)}
+
+// 弹窗控制函数
+function showModal(){
+  $("modal").style.display = "flex";
+}
+function hideModal(){
+  $("modal").style.display = "none";
+}
+
+// 清空函数
+function clearBs(){$("bs_d").value="";$("bs_v").value="";$("bs_r").innerText=""}
+function clearDx(){$("dx_d").value="";$("dx_v").value="";$("dx_r").innerText=""}
+function clearBz(){$("bz_z").value="";$("bz_d2").value="";$("bz_d1").value="";$("bz_r").innerText=""}
+function clearSc(){$("sc_b").value="";$("sc_h").value="";$("sc_d").value="";$("sc_r").innerText=""}
+function clearQd(){$("qd_q").value="";$("qd_d1").value="";$("qd_d2").value="";$("qd_r").innerText=""}
+function clearQd2(){$("qd2_f").value="";$("qd2_d").value="";$("qd2_r").innerText=""}
+function clearWz(){$("wz_d").value="";$("wz_m").value="";$("wz_x").value="6.11";$("wz_r").innerText=""}
+function clearMs(){$("ms_w").value="";$("ms_d").value="";$("ms_x").value="6.11";$("ms_r").innerText=""}
+function clearMz(){$("mz_n").value="";$("mz_w").value="";$("mz_t").value="";$("mz_d").value="";$("mz_r").innerText=""}
+function clearMzw(){$("mzw_d").value="";$("mzw_m").value="";$("mzw_r").innerText=""}
+function clearYg(){$("yg_d").value="";$("yg_l").value="";$("yg_r").innerText=""}
+function clearTb(){$("tb_c").value="";$("tb_k").value="";$("tb_g").value="";$("tb_r").innerText=""}
+
+// 带单位的计算函数
+function bs(){
+  let d=parseFloat($("bs_d").value.replace(/直径/g,''))||0;
+  let v=parseFloat($("bs_v").value.replace(/车速/g,''))||0;
+  if(d<=0 || v<=0){
+    showModal();
+    return;
+  }
+  let day = d*d*v*8.8;
+  let hour = day/24;
+  $("bs_r").innerText = "日产量："+day.toFixed(2)+" kg\n小时产量："+hour.toFixed(2)+" kg";
+}
+
+function dx(){
+  let d=parseFloat($("dx_d").value.replace(/直径/g,''))||0;
+  let v=parseFloat($("dx_v").value.replace(/车速/g,''))||0;
+  if(d<=0 || v<=0){
+    showModal();
+    return;
+  }
+  let day = d*d*v*18;
+  let hour = day/24;
+  $("dx_r").innerText = "日产量："+day.toFixed(2)+" kg\n小时产量："+hour.toFixed(2)+" kg";
+}
+
+function bz(){
+  let z=parseFloat($("bz_z").value.replace(/拔前上锌量/g,''))||0;
+  let d2=parseFloat($("bz_d2").value.replace(/拔后直径/g,''))||0;
+  let d1=parseFloat($("bz_d1").value.replace(/拔前直径/g,''))||0;
+  if(z<=0 || d2<=0 || d1<=0){
+    showModal();
+    return;
+  }
+  $("bz_r").innerText = "结果："+(z*d2/d1).toFixed(2)+" g/m²";
+}
+
+function sc(){
+  let b=parseFloat($("sc_b").value.replace(/白丝重量/g,''))||0;
+  let h=parseFloat($("sc_h").value.replace(/黑丝重量/g,''))||0;
+  let d=parseFloat($("sc_d").value.replace(/黑丝直径/g,''))||0;
+  if(b<=0 || h<=0 || d<=0){
+    showModal();
+    return;
+  }
+  $("sc_r").innerText = "结果："+((b-h)/h*d*1950).toFixed(2)+" g/m²";
+}
+
+function qd(){
+  let q=parseFloat($("qd_q").value.replace(/拔前强度/g,''))||0;
+  let d1=parseFloat($("qd_d1").value.replace(/拔前直径/g,''))||0;
+  let d2=parseFloat($("qd_d2").value.replace(/拔后直径/g,''))||0;
+  if(q<=0 || d1<=0 || d2<=0){
+    showModal();
+    return;
+  }
+  $("qd_r").innerText = "结果："+(q*Math.sqrt(d1/d2)).toFixed(2)+" MPa";
+}
+
+function qd2(){
+  let f=parseFloat($("qd2_f").value.replace(/拉断力/g,''))||0;
+  let d=parseFloat($("qd2_d").value.replace(/直径/g,''))||0;
+  if(f<=0 || d<=0){
+    showModal();
+    return;
+  }
+  $("qd2_r").innerText = "结果："+(f/d/d/0.7854).toFixed(2)+" MPa";
+}
+
+function wz(){
+  let d=parseFloat($("wz_d").value.replace(/直径/g,''))||0;
+  let m=parseFloat($("wz_m").value.replace(/米数/g,''))||0;
+  let x=parseFloat($("wz_x").value.replace(/系数/g,''))||0;
+  if(d<=0 || m<=0 || x<=0){
+    showModal();
+    return;
+  }
+  $("wz_r").innerText = "重量："+(d*d*x*m/1000).toFixed(3)+" kg";
+}
+
+function ms(){
+  let w=parseFloat($("ms_w").value.replace(/重量/g,''))||0;
+  let d=parseFloat($("ms_d").value.replace(/直径/g,''))||0;
+  let x=parseFloat($("ms_x").value.replace(/系数/g,''))||0;
+  if(w<=0 || d<=0 || x<=0){
+    showModal();
+    return;
+  }
+  $("ms_r").innerText = "米数："+(w/d/d/x*1000).toFixed(2)+" m";
+}
+
+function mz(){
+  let n=parseFloat($("mz_n").value.replace(/内宽/g,''))||0;
+  let w=parseFloat($("mz_w").value.replace(/外圆直径/g,''))||0;
+  let t=parseFloat($("mz_t").value.replace(/轴筒直径/g,''))||0;
+  let d=parseFloat($("mz_d").value.replace(/绞线直径/g,''))||0;
+  if(n<=0 || w<=0 || t<=0 || d<=0){
+    showModal();
+    return;
+  }
+  $("mz_r").innerText = "长度："+(0.74*n*(w*w-t*t)/d/d).toFixed(2)+" m";
+}
+
+function mzw(){
+  let d=parseFloat($("mzw_d").value.replace(/绞线直径/g,''))||0;
+  let m=parseFloat($("mzw_m").value.replace(/长度/g,''))||0;
+  if(d<=0 || m<=0){
+    showModal();
+    return;
+  }
+  $("mzw_r").innerText = "重量："+(7.168*6.11*d*d/9*m/1000).toFixed(3)+" kg";
+}
+
+function yg(){
+  let d=parseFloat($("yg_d").value.replace(/直径/g,''))||0;
+  let l=parseFloat($("yg_l").value.replace(/长度/g,''))||0;
+  if(d<=0 || l<=0){
+    showModal();
+    return;
+  }
+  $("yg_r").innerText = "重量："+(d*d*l*0.00617).toFixed(3)+" kg";
+}
+
+function tb(){
+  let c=parseFloat($("tb_c").value.replace(/长/g,''))||0;
+  let k=parseFloat($("tb_k").value.replace(/宽/g,''))||0;
+  let g=parseFloat($("tb_g").value.replace(/高/g,''))||0;
+  if(c<=0 || k<=0 || g<=0){
+    showModal();
+    return;
+  }
+  $("tb_r").innerText = "重量："+(c*k*g*7.85).toFixed(3)+" kg";
+}
+</script>
+</body>
 </html>
